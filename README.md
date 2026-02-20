@@ -4,20 +4,15 @@ Local text embedding service for Node.js. Runs **on-device**, no API key, no int
 
 Uses `@huggingface/transformers` with native `onnxruntime-node` bindings — **~100 texts/sec, ~26ms single-text latency** on a modern CPU.
 
+**Three ways to use it:** HTTP server · Node.js library · [`my` CLI integration](#my-cli-integration-optional) *(optional)*
+
 ---
 
 ## Quick Start
 
 ```bash
 npm install
-my update          # register with the 'my' CLI
-my embed serve     # start HTTP server on port 3721
-```
-
-Or run directly:
-
-```bash
-node app/server.js
+node app/server.js     # start HTTP server on port 3721
 ```
 
 ---
@@ -76,6 +71,23 @@ curl -s -X POST http://localhost:3721/embed \
 
 ---
 
+## `my` CLI Integration *(optional)*
+
+> This requires the [my](../my) CLI. Skip this section if you don't use it.
+
+```bash
+my update           # register my-embed with 'my'
+my embed serve      # start HTTP server
+my embed embed "Hello world"        # embed text
+my embed embed "Hello" "World" --json  # raw JSON
+my embed preload    # download/cache model
+my embed models     # list loaded models
+```
+
+The integration lives in [`cli.js`](./cli.js) at the project root — it's a thin wrapper over the same `api.js` and `app/server-runner.js` that everything else uses.
+
+---
+
 ## Library API
 
 Import directly from another Node.js project — no HTTP round-trip:
@@ -128,16 +140,16 @@ Other drop-in options:
 ## Project Structure
 
 ```
-access/embed/models.js       embedding model backend (init, embed, dispose)
-access/http.js               express/cors wrapper
-app/cli.js                   'my embed' CLI registration
-app/server.js                HTTP server entry point
-app/server-runner.js         programmatic server startup
-app/config.js                DEFAULT_MODEL, DEFAULT_PORT
-components/embed/embedder.js model pool + batch/single embed logic
-api.js                       importable library API
-data/cli-docs.md             full CLI reference
-STYLE.md                     code style guide (Flat JS)
+cli.js                               'my' CLI integration (optional)
+access/embed/models.js               embedding model backend (init, embed, dispose)
+access/http.js                       express/cors wrapper
+app/server.js                        HTTP server entry point
+app/server-runner.js                 programmatic server startup
+app/config.js                        DEFAULT_MODEL, DEFAULT_PORT
+components/embed/embedder.js         model pool + batch/single embed logic
+api.js                               importable library API
+data/cli-docs.md                     full CLI reference
+STYLE.md                             code style guide (Flat JS)
 ```
 
 ---

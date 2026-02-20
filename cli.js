@@ -1,12 +1,21 @@
-// app/cli.js
-// owns: CLI entry point, 'my' registration, command dispatch
+// cli.js
+// owns: 'my' CLI integration — registers this project with the 'my' CLI ecosystem
 // deps: Embedder, Config
+//
+// This file is OPTIONAL. The project works fully without it:
+//   - As an HTTP server:  node app/server.js
+//   - As a library:       import * as Embed from './api.js'
+//
+// This file is only needed if you use the 'my' CLI:
+//   my update           -- register this project
+//   my embed serve      -- start the HTTP server
+//   my embed embed "…"  -- embed text from the terminal
 
-import * as Embedder from '../components/embed/embedder.js'
-import * as Config from './config.js'
+import * as Embedder from './components/embed/embedder.js'
+import * as Config from './app/config.js'
 
 // ---------------------------------------------------------------------------
-// 'my' CLI registration
+// 'my' registration object — tells 'my' the name, description, and commands
 // ---------------------------------------------------------------------------
 
 export const cli = {
@@ -52,9 +61,7 @@ export async function embed(texts, opts = {}) {
     return
   }
   const vecs = await Embedder.embedBatch(texts, model)
-  if (opts.json) {
-    return vecs
-  }
+  if (opts.json) return vecs
   for (let i = 0; i < vecs.length; i++) {
     const v = vecs[i]
     const preview = v.slice(0, 6).map(x => x.toFixed(4)).join(', ')
@@ -66,19 +73,14 @@ export async function embed(texts, opts = {}) {
 export async function serve(opts = {}) {
   const port = opts.port || Config.DEFAULT_PORT
   const model = opts.model || Config.DEFAULT_MODEL
-
-  // Dynamically import server to avoid loading express in non-server contexts
-  const { default: startServer } = await import('./server-runner.js')
+  const { default: startServer } = await import('./app/server-runner.js')
   await startServer({ port, model })
 }
 
 export async function models() {
   const loaded = Embedder.loadedModels()
-  if (loaded.length === 0) {
-    console.log('(no models loaded in this process)')
-  } else {
-    for (const m of loaded) console.log(m)
-  }
+  if (loaded.length === 0) console.log('(no models loaded in this process)')
+  else for (const m of loaded) console.log(m)
   return loaded
 }
 
