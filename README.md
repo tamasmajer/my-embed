@@ -140,10 +140,47 @@ data/cli-docs.md             full CLI reference
 STYLE.md                     code style guide (Flat JS)
 ```
 
-Follows [Flat JS](./STYLE.md) — every function call is statically resolvable by name alone.
-
 ---
 
-## Models are cached locally
+## Contributing / Code Style
 
-Downloaded models are stored in `./local_cache/` (gitignored). Run `my embed preload` once to download, subsequent runs are instant.
+This project follows **Flat JS** — see [`STYLE.md`](./STYLE.md) for the full guide.
+
+### Key rules
+
+**Folder roles**
+
+| Folder | Purpose |
+|--------|---------|
+| `app/` | Entry points only. Imports from `components/` and `access/`. Nothing imports from here. |
+| `components/<domain>/` | Feature logic. Imports only from `access/` and its own folder. Never from other components. |
+| `access/<domain>/` | Thin wrappers around npm/Node. One external dependency per file. |
+| `dev/` | Scratch scripts, benchmarks, experiments. Not wired into the main graph. |
+
+**Import style**
+
+```js
+// Always namespace imports — never named/destructured
+import * as Models  from '../access/embed/models.js'
+import * as Embedder from '../components/embed/embedder.js'
+
+Models.embed(handle, texts)   // greppable: module is always visible at the call site
+```
+
+**Access modules**
+
+- Export flat functions only — no classes, no objects with methods
+- Use opaque integer handles for stateful resources:
+
+```js
+const handle = await Models.init('Xenova/bge-small-en-v1.5')
+const vecs   = await Models.embed(handle, texts)
+Models.dispose(handle)
+```
+
+**Adding a new model backend**
+
+1. Create `access/embed/<new-backend>.js` — export `init`, `embed`, `dispose`
+2. Update `components/embed/embedder.js` to call it
+3. Nothing else changes (`api.js`, `app/`, HTTP server stay untouched)
+
