@@ -1,0 +1,23 @@
+{
+  "name": "my-embed",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Local text embedding service using @huggingface/transformers (native ONNX)",
+  "scripts": {
+    "start": "node app/server.js",
+    "dev": "node --watch app/server.js"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
