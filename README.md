@@ -2,7 +2,7 @@
 
 Local text embedding service for Node.js. Runs **on-device**, no API key, no internet required after first model download.
 
-Uses `@huggingface/transformers` with native `onnxruntime-node` bindings — **~100 texts/sec, ~26ms single-text latency** on a modern CPU.
+Uses `@huggingface/transformers` with native `onnxruntime-node` bindings — **~800 texts/sec, ~7ms single-text latency** on a modern CPU.
 
 **Two ways to use it:** Node.js library · HTTP server
 
@@ -98,13 +98,23 @@ curl -s -X POST http://localhost:3721/embed \
 
 Benchmarked on Intel i5, `Xenova/bge-small-en-v1.5` (384 dims):
 
-| Metric             | Result       |
-|--------------------|--------------|
-| Single text        | ~26ms        |
-| 512 texts (batch)  | ~5s (~100/s) |
-| Cold start (init)  | ~500ms       |
+| Metric             | Result         |
+|--------------------|----------------|
+| Single text        | ~7ms           |
+| 100 texts (batch)  | ~120ms (812/s) |
+| 512 texts (batch)  | ~665ms (770/s) |
+| 1024 texts (batch) | ~1.4s (726/s)  |
+| Cold start (init)  | ~500ms         |
 
 > The server pre-warms the model on startup, so the HTTP API never pays the cold start cost.
+
+### Stress test
+
+`dev/stress-test.js` runs 17 cases covering edge cases (empty strings, unicode, long text), batch sizes up to 512, vector normalization checks, and 10 concurrent `embed()` calls. Run it with:
+
+```bash
+node dev/stress-test.js
+```
 
 ---
 
