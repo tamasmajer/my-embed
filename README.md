@@ -110,7 +110,14 @@ Benchmarked on Intel i5, `Xenova/bge-small-en-v1.5` (384 dims):
 
 ### Stress test
 
-`dev/stress-test.js` runs 17 cases covering edge cases (empty strings, unicode, long text), batch sizes up to 512, vector normalization checks, and 10 concurrent `embed()` calls. Run it with:
+`dev/stress-test.js` — 17 tests:
+
+- **Basics**: single/batch embed, normalization, determinism
+- **Edge cases**: empty string, 10k-char text, unicode/emoji, empty array rejection
+- **Batch sizes**: 10, 50, 100, 256, 512 texts
+- **Concurrency**: 10 simultaneous `embed()` calls
+
+`Xenova/multilingual-e5-small` was also tested (23 tests) with cross-language retrieval — Hungarian queries correctly matched English documents in 4/5 cases, with similarity scores 0.80–0.87 across 10 languages.
 
 ```bash
 node dev/stress-test.js
