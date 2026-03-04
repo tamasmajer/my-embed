@@ -78,25 +78,25 @@ curl -s -X POST http://localhost:3721/embed \
 | Field    | Type       | Default                      | Description            |
 |----------|------------|------------------------------|------------------------|
 | `texts`  | `string[]` | required                     | Texts to embed         |
-| `model`  | `string`   | `Xenova/bge-small-en-v1.5`   | HuggingFace model id   |
+| `model`  | `string`   | `Xenova/multilingual-e5-small` | HuggingFace model id   |
 
 ### `GET /health`
 
 ```json
-{ "ok": true, "result": { "status": "ok", "models": ["Xenova/bge-small-en-v1.5"] } }
+{ "ok": true, "result": { "status": "ok", "models": ["Xenova/multilingual-e5-small"] } }
 ```
 
 ### `GET /models`
 
 ```json
-{ "ok": true, "result": ["Xenova/bge-small-en-v1.5"] }
+{ "ok": true, "result": ["Xenova/multilingual-e5-small"] }
 ```
 
 ---
 
 ## Performance
 
-Benchmarked on Intel i5, `Xenova/bge-small-en-v1.5` (384 dims):
+Benchmarked on Intel i5, `Xenova/multilingual-e5-small` (384 dims):
 
 | Metric             | Result         |
 |--------------------|----------------|
@@ -127,14 +127,14 @@ node dev/stress-test.js
 
 ## Default Model
 
-`Xenova/bge-small-en-v1.5` — 384 dimensions, ~33MB, English.
+`Xenova/multilingual-e5-small` — 384 dimensions, ~118MB, 100+ languages.
 
 Other drop-in options:
 
 | Model                          | Dims | Notes                              |
 |-------------------------------|------|------------------------------------|
-| `Xenova/bge-small-en-v1.5`    | 384  | default, fast, English             |
-| `Xenova/multilingual-e5-small`| 384  | 100+ languages, cross-lingual retrieval |
+| `Xenova/multilingual-e5-small`| 384  | default, 100+ languages            |
+| `Xenova/bge-small-en-v1.5`    | 384  | fast, English-only                 |
 | `Xenova/bge-base-en-v1.5`     | 768  | higher quality, English            |
 | `Xenova/all-MiniLM-L6-v2`     | 384  | sentence-transformers classic      |
 | `Xenova/nomic-embed-text-v1.5`| 768  | long context                       |
