@@ -1,24 +1,23 @@
-# Flat JS — my-embed Style Guide
+# Static JS Refs — my-embed Style Guide
 
-Same rules as the workspace STYLE.md, applied here.
+Same rules as the workspace style guide, applied here.
 
 ## Folder Structure
 
 ```
-app/              entry points (cli.js, server.js, server-runner.js, config.js)
+app/              entry points (server.js, config.js)
 components/       feature modules by domain
   embed/          model pool, batching logic
 access/           npm/node wrappers — subfolders group by domain
   embed/          embedding backend (models.js)
   http.js         HTTP server wiring
-data/             docs, non-code files
 api.js            importable API for other projects (no HTTP)
 ```
 
 ## Import Convention
 
 ```js
-import * as Models from '../../access/models.js'   // namespace, CamelCase
+import * as Models from '../../access/embed/models.js'   // namespace, CamelCase
 import * as Embedder from '../components/embed/embedder.js'
 
 Models.init(modelName)           // greppable: module always visible
@@ -33,7 +32,7 @@ Embedder.embedBatch(texts, model)
 ## Access Module Rules
 
 - Export flat functions only — no classes, no objects with methods
-- Opaque handles for stateful external resources (see `access/models.js`)
+- Opaque handles for stateful external resources (see `access/embed/models.js`)
 - No cross-imports between access modules
 
 ## State Pattern
@@ -49,7 +48,7 @@ Functions receive/return plain data; callers never touch library objects directl
 ## Adding a New Model Provider
 
 1. Create `access/<role>.js` — wrap the npm SDK, export `init`, `embed`, `dispose`
-2. Use an opaque integer handle pattern (see `access/models.js`)
+2. Use an opaque integer handle pattern (see `access/embed/models.js`)
 3. Update `components/embed/embedder.js` to call the new access module
 4. No changes needed in `app/` or `api.js`
 

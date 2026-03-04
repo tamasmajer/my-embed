@@ -4,7 +4,7 @@ Local text embedding service for Node.js. Runs **on-device**, no API key, no int
 
 Uses `@huggingface/transformers` with native `onnxruntime-node` bindings — **~100 texts/sec, ~26ms single-text latency** on a modern CPU.
 
-**Three ways to use it:** HTTP server · Node.js library · [`my` CLI integration](#my-cli-integration-optional) *(optional)*
+**Two ways to use it:** Node.js library · HTTP server
 
 ---
 
@@ -12,21 +12,44 @@ Uses `@huggingface/transformers` with native `onnxruntime-node` bindings — **~
 
 ```bash
 npm install
-node app/server.js     # start HTTP server on port 3721
+```
+
+### As a library
+
+```js
+import * as Embed from 'my-embed/api.js'
+
+await Embed.preload()                              // optional warm-up
+const vecs = await Embed.embed(['Hello world'])    // number[][]
+console.log(vecs[0].length)                        // 384
+```
+
+### As an HTTP server
+
+```bash
+node app/server.js     # starts on port 3721
 ```
 
 ---
 
-## CLI
+## Library API
 
-```bash
-my embed embed "Hello world"                     # embed text, print preview
-my embed embed "Hello" "World" --json            # raw JSON output
-my embed serve                                   # start HTTP server
-my embed serve --port 4000                       # custom port
-my embed preload                                 # download/cache the model
-my embed models                                  # list loaded models
+Import directly from another Node.js project — no HTTP round-trip.
+
+```js
+import * as Embed from 'my-embed/api.js'
+
+const vecs = await Embed.embed(['Hello world', 'Fast embeddings'])
+console.log(vecs[0].length) // 384
 ```
+
+### `embed(texts)` → `Promise<number[][]>`
+
+Embed a batch of texts. Lazy-loads the model on first call.
+
+### `preload()` → `Promise<void>`
+
+Pre-warm the model so the first `embed()` call doesn't pay the ~500ms init cost.
 
 ---
 
@@ -71,43 +94,6 @@ curl -s -X POST http://localhost:3721/embed \
 
 ---
 
-## `my` CLI Integration *(optional)*
-
-> This requires the [my](../my) CLI. Skip this section if you don't use it.
-
-```bash
-my update           # register my-embed with 'my'
-my embed serve      # start HTTP server
-my embed embed "Hello world"        # embed text
-my embed embed "Hello" "World" --json  # raw JSON
-my embed preload    # download/cache model
-my embed models     # list loaded models
-```
-
-The integration lives in [`cli.js`](./cli.js) at the project root — it's a thin wrapper over the same `api.js` and `app/server-runner.js` that everything else uses.
-
----
-
-## Library API
-
-Import directly from another Node.js project — no HTTP round-trip:
-
-```js
-import * as Embed from '../my-embed/api.js'
-
-// Batch
-const vecs = await Embed.embed(['Hello world', 'Fast embeddings'])
-console.log(vecs[0].length) // 384
-
-// Single
-const vec = await Embed.embedOne('Hello world')
-
-// Optional warm-up (avoids cold start on first call)
-await Embed.preload()
-```
-
----
-
 ## Performance
 
 Benchmarked on Intel i5, `Xenova/bge-small-en-v1.5` (384 dims):
@@ -140,23 +126,21 @@ Other drop-in options:
 ## Project Structure
 
 ```
-cli.js                               'my' CLI integration (optional)
+api.js                               public library API (embed, preload)
 access/embed/models.js               embedding model backend (init, embed, dispose)
 access/http.js                       express/cors wrapper
 app/server.js                        HTTP server entry point
-app/server-runner.js                 programmatic server startup
 app/config.js                        DEFAULT_MODEL, DEFAULT_PORT
 components/embed/embedder.js         model pool + batch/single embed logic
-api.js                               importable library API
-data/cli-docs.md                     full CLI reference
-STYLE.md                             code style guide (Flat JS)
+STYLE.md                             code style guide (Static JS Refs)
+dev/                                 scratch scripts, benchmarks (not part of main graph)
 ```
 
 ---
 
 ## Contributing / Code Style
 
-This project follows **Flat JS** — see [`STYLE.md`](./STYLE.md) for the full guide.
+This project follows **Static JS Refs** — see [`STYLE.md`](./STYLE.md) for the full guide.
 
 ### Key rules
 
@@ -195,4 +179,3 @@ Models.dispose(handle)
 1. Create `access/embed/<new-backend>.js` — export `init`, `embed`, `dispose`
 2. Update `components/embed/embedder.js` to call it
 3. Nothing else changes (`api.js`, `app/`, HTTP server stay untouched)
-
