@@ -124,12 +124,13 @@ node dev/stress-test.js
 
 Other drop-in options:
 
-| Model                          | Dims | Notes                        |
-|-------------------------------|------|------------------------------|
-| `Xenova/bge-small-en-v1.5`    | 384  | default, fast                |
-| `Xenova/bge-base-en-v1.5`     | 768  | higher quality               |
-| `Xenova/all-MiniLM-L6-v2`     | 384  | sentence-transformers classic|
-| `Xenova/nomic-embed-text-v1.5`| 768  | long context                 |
+| Model                          | Dims | Notes                              |
+|-------------------------------|------|------------------------------------|
+| `Xenova/bge-small-en-v1.5`    | 384  | default, fast, English             |
+| `Xenova/multilingual-e5-small`| 384  | 100+ languages, cross-lingual retrieval |
+| `Xenova/bge-base-en-v1.5`     | 768  | higher quality, English            |
+| `Xenova/all-MiniLM-L6-v2`     | 384  | sentence-transformers classic      |
+| `Xenova/nomic-embed-text-v1.5`| 768  | long context                       |
 
 ---
 
